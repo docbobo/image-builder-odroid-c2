@@ -115,8 +115,9 @@ get_gpg "${PACKAGECLOUD_FPR}" "${PACKAGECLOUD_KEY_URL}"
 # set up hypriot schatzkiste repository for generic packages
 echo 'deb https://packagecloud.io/Hypriot/Schatzkiste/debian/ jessie main' >> /etc/apt/sources.list.d/hypriot.list
 
-# add armhf as additional architecure (see below)
-dpkg --add-architecture armhf
+# remove sudoers files
+rm -f /etc/sudoers.d/010_pi-nopasswd
+rm -f /etc/sudoers.d/user-pirate
 
 # update all apt repository lists
 export DEBIAN_FRONTEND=noninteractive
@@ -127,9 +128,6 @@ apt-get upgrade -y
 packages=(
     # as the Odroid C2 does not have a hardware clock we need a fake one
     fake-hwclock
-
-    # install device-init
-    device-init:armhf=${DEVICE_INIT_VERSION}
 
     # install dependencies for docker-tools
     lxc
@@ -142,6 +140,7 @@ packages=(
 
     # required to install docker-compose
     python-pip
+    cloud-init
 )
 
 apt-get -y install --no-install-recommends ${packages[*]}
@@ -164,6 +163,11 @@ apt-get -y install \
     --no-install-recommends \
     u-boot-tools \
     "linux-image-${KERNEL_VERSION}"
+
+# set up cloud-init
+mkdir -p /var/lib/cloud/seed/nocloud-net
+ln -s /boot/user-data /var/lib/cloud/seed/nocloud-net/user-data
+ln -s /boot/meta-data /var/lib/cloud/seed/nocloud-net/meta-data
 
 # Restore os-release additions
 cat /tmp/os-release.add >> /etc/os-release

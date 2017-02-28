@@ -4,3 +4,5 @@
 *.tar.gz
 *.xz
 .vagrant/
+user-data*
+meta-data*
