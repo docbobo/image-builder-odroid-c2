@@ -140,7 +140,9 @@ packages=(
 
     # required to install docker-compose
     python-pip
-    cloud-init
+
+    cloud-init          # cloud-init replaces device-init
+    ssh-import-id       # required to import ssh keys
 )
 
 apt-get -y install --no-install-recommends ${packages[*]}
